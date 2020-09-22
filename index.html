@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Geo!</title>
+		<style type="text/css">
+			html, body {
+				margin: 0;
+				height: 100%;
+				font-size: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas></canvas>
+
+		<script type="text/javascript">
+			function PLOT() {
+
+O = Point(0, 0);
+Circle(O, 1);
+
+N = Point[text="N",color=blue,left](-1, 0);
+S = Point[text="S",color=blue,right](1, 0);
+Segment[color=blue](N, S);
+
+			}
+		</script>
+
+		<script type="text/javascript">
+			window.Geo = {};
+		</script>
+
+		<script type="text/javascript" src="js/geo/properties.js"></script>
+		<script type="text/javascript" src="js/geo/functions.js"></script>
+		<script type="text/javascript" src="js/geo/render.js"></script>
+		<script type="text/javascript" src="js/geo/main.js"></script>
+	</body>
+</html>
