@@ -12,7 +12,7 @@ Geo.functions = {
 				ctx.beginPath();
 				ctx.arc(centerXScr, centerYScr, radiusScr, 0, 2 * Math.PI);
 				ctx.strokeStyle = "black";
-				ctx.lineWidth = 1;
+				ctx.lineWidth = 2;
 				ctx.stroke();
 			}
 		};
@@ -29,6 +29,7 @@ Geo.functions = {
 
 		return {
 			type: this.Point,
+			props,
 			x,
 			y,
 			render(ctx) {
@@ -52,10 +53,10 @@ Geo.functions = {
 		const bXScr = Geo.render.toScreenCoordX(b.x);
 		const bYScr = Geo.render.toScreenCoordY(b.y);
 
-		// let text = null;
-		// if(props.text) {
-			// text = this.TextAtScreen(props, {x: xScr, y: yScr}, {x: xScr, y: yScr});
-		// }
+		let text = null;
+		if(props.text) {
+			text = this.TextAtScreen(props, {x: aXScr, y: aYScr}, {x: bXScr, y: bYScr});
+		}
 
 		return {
 			type: this.Segment,
@@ -68,11 +69,27 @@ Geo.functions = {
 				ctx.strokeStyle = props.color || "black";
 				ctx.lineWidth = 3;
 				ctx.stroke();
-				// if(text) {
-				// 	text.render(ctx);
-				// }
+				if(text) {
+					text.render(ctx);
+				}
 			}
 		};
+	},
+
+	Rotate(props, object, angle, center) {
+		const x0 = object.x - center.x;
+		const y0 = object.y - object.y;
+
+		const sin = Math.sin(angle);
+		const cos = Math.cos(angle);
+
+		// (x0 + i y0) (cos + i sin) =
+		// (x0 cos - y0 sin) + i (y0 cos + x0 sin)
+
+		const newX = x0 * cos - y0 * sin;
+		const newY = y0 * cos + x0 * sin;
+
+		return this.Point(props, newX, newY);
 	},
 
 	TextAtScreen(props, scr1, scr2) {
@@ -87,22 +104,37 @@ Geo.functions = {
 		let point;
 		if(props.left) {
 			point = scr1.x < scr2.x ? scr1 : scr2;
-			point = {x: point.x - width - 18, y: point.y + 7};
+			point = {
+				x: point.x - width - 18,
+				y: props.midway ? (scr1.y + scr2.y) / 2 + 7 : point.y + 7
+			};
 		} else if(props.right) {
 			point = scr1.x > scr2.x ? scr1 : scr2;
-			point = {x: point.x + 18, y: point.y + 7};
+			point = {
+				x: point.x + 18,
+				y: props.midway ? (scr1.y + scr2.y) / 2 + 7 : point.y + 7
+			};
 		} else if(props.above) {
-			point = scr1.y > scr2.y ? scr1 : scr2;
-			point = {x: point.x - width / 2, y: point.y - 12};
-		} else if(props.below) {
 			point = scr1.y < scr2.y ? scr1 : scr2;
-			point = {x: point.x - width / 2, y: point.y + 25};
+			point = {
+				x: (props.midway ? (scr1.x + scr2.x) / 2 : point.x) - width / 2,
+				y: point.y - 12
+			};
+		} else if(props.below) {
+			point = scr1.y > scr2.y ? scr1 : scr2;
+			point = {
+				x: (props.midway ? (scr1.x + scr2.x) / 2 : point.x) - width / 2,
+				y: point.y + 25
+			};
+		} else {
+			throw new Error("No text coordinates specified");
 		}
 
 		return {
 			type: this.TextAtScreen,
 			render(ctx) {
 				ctx.font = "18px Arial";
+				ctx.fillStyle = props.color || "black";
 				ctx.fillText(props.text, point.x, point.y);
 			}
 		};

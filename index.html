@@ -21,7 +21,11 @@ Circle(O, 1);
 
 N = Point[text="N",color=blue,left](-1, 0);
 S = Point[text="S",color=blue,right](1, 0);
-Segment[color=blue](N, S);
+Segment[color=blue,text="Горизонт",midway,above](N, S);
+
+P = Rotate[text="P",color=red,left](N, deg(-30), O);
+P_ = Rotate[text="P'",color=red,right](S, deg(-30), O);
+Segment[color=red,text="Ось мира",above,midway](P, P_);
 
 			}
 		</script>
